@@ -2848,18 +2848,56 @@
     let gTokenClient = null;
     let gAccessToken = null;
 
-        function renderAllViews() {
-      updateStatsAndBanner();
-      renderMonthlyCalendar();
-      renderDailyView();
-      renderTaskList();
-      renderCharts();
+    function renderAllViews() {
+      if (typeof updateStatsAndBanner === 'function') updateStatsAndBanner();
+      if (typeof renderMonthlyCalendar === 'function') renderMonthlyCalendar();
+      if (typeof renderDailyView === 'function') renderDailyView();
+      if (typeof renderTaskList === 'function') renderTaskList();
+      if (typeof renderCharts === 'function') renderCharts();
+    }
+
+    function getSavedGoogleToken() {
+      try {
+        const raw = sessionStorage.getItem('academic_tracker_gtoken');
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        if (data && data.token && data.expiresAt > Date.now()) {
+          return data.token;
+        }
+      } catch (e) {
+        console.warn('Token read error', e);
+      }
+      return null;
+    }
+
+    function saveGoogleToken(token, expiresIn) {
+      try {
+        const expiresAt = Date.now() + ((expiresIn || 3600) * 1000);
+        sessionStorage.setItem('academic_tracker_gtoken', JSON.stringify({ token, expiresAt }));
+      } catch (e) {
+        console.warn('Token save error', e);
+      }
+    }
+
+    function clearGoogleToken() {
+      sessionStorage.removeItem('academic_tracker_gtoken');
+      gAccessToken = null;
     }
 
     function initGoogleSyncEngine() {
       const savedClientId = localStorage.getItem('academic_tracker_gclient_id');
       if (savedClientId) {
         document.getElementById('inputGoogleClientId').value = savedClientId;
+      }
+
+      // Check if we have an active valid session token
+      const existingToken = getSavedGoogleToken();
+      if (existingToken) {
+        gAccessToken = existingToken;
+        updateGoogleSyncBadge(true);
+        setTimeout(() => {
+          fetchAndMergeGoogleData();
+        }, 300);
       }
 
       document.getElementById('btnGoogleSync').addEventListener('click', () => {
@@ -2931,18 +2969,16 @@
     }
 
     function disconnectGoogleAccount() {
-      if (gAccessToken && window.google && window.google.accounts && window.google.accounts.oauth2) {
-        google.accounts.oauth2.revoke(gAccessToken, () => {
-          gAccessToken = null;
-          updateGoogleSyncBadge(false);
-          document.getElementById('btnDisconnectGoogle').classList.add('hidden');
-          showSyncStatus('Disconnected from Google.', 'info');
-        });
-      } else {
-        gAccessToken = null;
-        updateGoogleSyncBadge(false);
-        document.getElementById('btnDisconnectGoogle').classList.add('hidden');
-        showSyncStatus('Disconnected from Google.', 'info');
+      const currentTok = gAccessToken;
+      clearGoogleToken();
+      updateGoogleSyncBadge(false);
+      document.getElementById('btnDisconnectGoogle').classList.add('hidden');
+      showSyncStatus('Disconnected from Google.', 'info');
+
+      if (currentTok && window.google && window.google.accounts && window.google.accounts.oauth2) {
+        try {
+          google.accounts.oauth2.revoke(currentTok, () => {});
+        } catch (e) {}
       }
     }
 
@@ -2971,6 +3007,7 @@
               return;
             }
             gAccessToken = resp.access_token;
+            saveGoogleToken(resp.access_token, resp.expires_in);
             updateGoogleSyncBadge(true);
             document.getElementById('btnDisconnectGoogle').classList.remove('hidden');
             showSyncStatus('Authorized! Fetching live Google Calendar events and Google Tasks...', 'info');
@@ -3082,6 +3119,9 @@
           saveTasks(currentTasks);
           renderAllViews();
           showSyncStatus(`Successfully synchronized ${liveGoogleTasks.length} items from Google!`, 'success');
+          setTimeout(() => {
+            closeGoogleSyncModal();
+          }, 1200);
         } else {
           showSyncStatus('Connected successfully! No additional items found in Google Tasks / Calendar.', 'success');
         }
