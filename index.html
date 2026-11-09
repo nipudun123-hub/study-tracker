@@ -1173,13 +1173,35 @@
             "completed": false
       },
       {
-            "id": "t_csm_deploy",
+            "id": "t_csm_lab12",
             "course": "CSM3313",
-            "title": "[CSM3313] Project Deployment & Monitoring",
+            "title": "[CSM3313] Lab 12: Project Deployment & Monitoring",
             "date": "2026-12-26",
             "time": "",
             "weight": "Lab 12",
-            "desc": "IoT Computing field project deployment and live sensor monitoring",
+            "desc": "CSM3313 Lab 12: Field project deployment preparation and monitoring per syllabus",
+            "type": "assignment",
+            "completed": false
+      },
+      {
+            "id": "t_csm_deploy_start",
+            "course": "CSM3313",
+            "title": "[CSM3313] Group Project: System Deployment",
+            "date": "2027-01-02",
+            "time": "09:00",
+            "weight": "Project",
+            "desc": "Outdoor installation of IoT monitoring station; autonomous 7-consecutive-day (168-hour) run starts",
+            "type": "assignment",
+            "completed": false
+      },
+      {
+            "id": "t_csm_deploy_end",
+            "course": "CSM3313",
+            "title": "[CSM3313] Group Project: End of 7-Day Deployment & Retrieval",
+            "date": "2027-01-09",
+            "time": "09:00",
+            "weight": "Project",
+            "desc": "Completion of 168 hours outdoor run, retrieval of equipment, and sensor data compilation",
             "type": "assignment",
             "completed": false
       },
@@ -1373,11 +1395,11 @@
       {
             "id": "e_csm_demo",
             "course": "CSM3313",
-            "title": "[CSM3313] Project Demonstration & Presentation",
-            "date": "2027-01-04",
-            "time": "",
+            "title": "[CSM3313] Final Project Presentation & Demonstration",
+            "date": "2027-01-11",
+            "time": "14:00",
             "weight": "20%",
-            "desc": "IoT Computing live project prototype demo & presentation (20%)",
+            "desc": "Week 14 Final Project Presentation (20%): Demonstration of system, DIY sensor, live dashboard, Instructables documentation, deployment endurance data",
             "type": "presentation",
             "completed": false
       },
@@ -1395,7 +1417,7 @@
 ];
 
     // Local Storage Keys
-    const STORAGE_KEY = 'academic_tracker_tasks_en_v10';
+    const STORAGE_KEY = 'academic_tracker_tasks_en_v12';
     const DAILY_TODOS_KEY = 'academic_tracker_daily_todos_en_v10';
     const DAILY_BLOCKS_KEY = 'academic_tracker_daily_blocks_en_v10';
 
@@ -1814,6 +1836,16 @@
     }
 
     // ====================================================
+    function shiftDateStr(dateStr, days) {
+      const parts = dateStr.split('-');
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      d.setDate(d.getDate() + days);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     // 2. DAILY SCHEDULE VIEW (Editable Time Blocks)
     // ====================================================
 
@@ -1844,12 +1876,11 @@
       let html = '';
       
       for (let offset = -3; offset <= 3; offset++) {
-        const d = new Date(centerDate.getTime() + offset * 86400000);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const dayNum = String(d.getDate()).padStart(2, '0');
-        const dStr = `${y}-${m}-${dayNum}`;
+        const dStr = shiftDateStr(selectedDailyDateStr, offset);
+        const parts = dStr.split('-');
+        const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
         const dow = d.getDay();
+        const dayNum = parts[2];
         const isCurrentActive = dStr === selectedDailyDateStr;
 
         const dayDdls = currentTasks.filter(t => t.date === dStr && !t.completed);
@@ -2509,9 +2540,13 @@
 
       // Daily Controls
       document.getElementById('btnPrevDay').addEventListener('click', () => {
-        const cur = new Date(selectedDailyDateStr + 'T00:00:00');
-        const prev = new Date(cur.getTime() - 86400000);
-        selectedDailyDateStr = prev.toISOString().split('T')[0];
+        selectedDailyDateStr = shiftDateStr(selectedDailyDateStr, -1);
+        calSelectedDayStr = selectedDailyDateStr;
+        renderDailyView();
+      });
+
+      document.getElementById('btnNextDay').addEventListener('click', () => {
+        selectedDailyDateStr = shiftDateStr(selectedDailyDateStr, 1);
         calSelectedDayStr = selectedDailyDateStr;
         renderDailyView();
       });
