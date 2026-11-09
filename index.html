@@ -535,7 +535,7 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Your Google OAuth Client ID:</label>
-          <input type="text" id="inputGoogleClientId" placeholder="e.g. 123456789-abcdef.apps.googleusercontent.com" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono">
+          <input type="text" id="inputGoogleClientId" value="725359638596-1cjrf8r6qtq8n194qntp4nv4ua7mqvl0.apps.googleusercontent.com" placeholder="725359638596-1cjrf8r6qtq8n194qntp4nv4ua7mqvl0.apps.googleusercontent.com" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono">
           <p class="text-[10px] text-slate-400 mt-1">Saved securely in your browser's localStorage. 100% free with no credit card required.</p>
         </div>
 
@@ -2845,6 +2845,9 @@
     // ====================================================
     // GOOGLE CALENDAR & TASKS LIVE SYNC ENGINE
     // ====================================================
+    // Pre-configured Google OAuth Client ID
+    const DEFAULT_GOOGLE_CLIENT_ID = "725359638596-1cjrf8r6qtq8n194qntp4nv4ua7mqvl0.apps.googleusercontent.com";
+
     let gTokenClient = null;
     let gAccessToken = null;
 
@@ -2885,7 +2888,7 @@
     }
 
     function initGoogleSyncEngine() {
-      const savedClientId = localStorage.getItem('academic_tracker_gclient_id');
+      const savedClientId = localStorage.getItem('academic_tracker_gclient_id') || DEFAULT_GOOGLE_CLIENT_ID;
       if (savedClientId) {
         document.getElementById('inputGoogleClientId').value = savedClientId;
       }
@@ -2923,7 +2926,7 @@
 
     function openGoogleSyncModal() {
       document.getElementById('googleSyncModal').classList.remove('hidden');
-      const savedClientId = localStorage.getItem('academic_tracker_gclient_id');
+      const savedClientId = localStorage.getItem('academic_tracker_gclient_id') || DEFAULT_GOOGLE_CLIENT_ID;
       if (savedClientId) {
         document.getElementById('inputGoogleClientId').value = savedClientId;
       }
