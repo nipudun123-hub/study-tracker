@@ -2848,6 +2848,14 @@
     let gTokenClient = null;
     let gAccessToken = null;
 
+        function renderAllViews() {
+      updateStatsAndBanner();
+      renderMonthlyCalendar();
+      renderDailyView();
+      renderTaskList();
+      renderCharts();
+    }
+
     function initGoogleSyncEngine() {
       const savedClientId = localStorage.getItem('academic_tracker_gclient_id');
       if (savedClientId) {
