@@ -2841,8 +2841,252 @@
       });
     }
 
+    
+    // ====================================================
+    // GOOGLE CALENDAR & TASKS LIVE SYNC ENGINE
+    // ====================================================
+    let gTokenClient = null;
+    let gAccessToken = null;
+
+    function initGoogleSyncEngine() {
+      const savedClientId = localStorage.getItem('academic_tracker_gclient_id');
+      if (savedClientId) {
+        document.getElementById('inputGoogleClientId').value = savedClientId;
+      }
+
+      document.getElementById('btnGoogleSync').addEventListener('click', () => {
+        openGoogleSyncModal();
+      });
+
+      document.getElementById('btnCloseSyncModal').addEventListener('click', closeGoogleSyncModal);
+      document.getElementById('btnCancelSyncModal').addEventListener('click', closeGoogleSyncModal);
+
+      document.getElementById('btnSaveAndAuthorize').addEventListener('click', () => {
+        startGoogleOAuthFlow();
+      });
+
+      document.getElementById('btnDisconnectGoogle').addEventListener('click', () => {
+        disconnectGoogleAccount();
+      });
+
+      // Update button status badge if already authorized in session
+      if (gAccessToken) {
+        updateGoogleSyncBadge(true);
+      }
+    }
+
+    function openGoogleSyncModal() {
+      document.getElementById('googleSyncModal').classList.remove('hidden');
+      const savedClientId = localStorage.getItem('academic_tracker_gclient_id');
+      if (savedClientId) {
+        document.getElementById('inputGoogleClientId').value = savedClientId;
+      }
+      if (gAccessToken) {
+        document.getElementById('btnDisconnectGoogle').classList.remove('hidden');
+        showSyncStatus('Currently connected to Google. Click Authorize & Sync Now to refresh.', 'info');
+      } else {
+        document.getElementById('btnDisconnectGoogle').classList.add('hidden');
+      }
+    }
+
+    function closeGoogleSyncModal() {
+      document.getElementById('googleSyncModal').classList.add('hidden');
+    }
+
+    function showSyncStatus(msg, type) {
+      const box = document.getElementById('syncStatusBox');
+      box.classList.remove('hidden', 'bg-rose-50', 'text-rose-700', 'border-rose-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200', 'bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+      box.classList.add('border');
+
+      if (type === 'error') {
+        box.classList.add('bg-rose-50', 'text-rose-700', 'border-rose-200');
+      } else if (type === 'success') {
+        box.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+      } else {
+        box.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+      }
+      box.innerText = msg;
+    }
+
+    function updateGoogleSyncBadge(connected) {
+      const btn = document.getElementById('btnGoogleSync');
+      const text = document.getElementById('googleSyncBtnText');
+      if (connected) {
+        btn.classList.remove('border-slate-200', 'bg-white', 'text-slate-700');
+        btn.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
+        text.innerText = '🟢 Google Live (Syncing)';
+      } else {
+        btn.classList.remove('border-emerald-200', 'bg-emerald-50', 'text-emerald-800');
+        btn.classList.add('border-slate-200', 'bg-white', 'text-slate-700');
+        text.innerText = 'Sync with Google';
+      }
+    }
+
+    function disconnectGoogleAccount() {
+      if (gAccessToken && window.google && window.google.accounts && window.google.accounts.oauth2) {
+        google.accounts.oauth2.revoke(gAccessToken, () => {
+          gAccessToken = null;
+          updateGoogleSyncBadge(false);
+          document.getElementById('btnDisconnectGoogle').classList.add('hidden');
+          showSyncStatus('Disconnected from Google.', 'info');
+        });
+      } else {
+        gAccessToken = null;
+        updateGoogleSyncBadge(false);
+        document.getElementById('btnDisconnectGoogle').classList.add('hidden');
+        showSyncStatus('Disconnected from Google.', 'info');
+      }
+    }
+
+    function startGoogleOAuthFlow() {
+      const clientId = document.getElementById('inputGoogleClientId').value.trim();
+      if (!clientId) {
+        showSyncStatus('Please enter a valid Google OAuth Client ID.', 'error');
+        return;
+      }
+      localStorage.setItem('academic_tracker_gclient_id', clientId);
+
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+        showSyncStatus('Google Identity Services SDK is still loading or blocked. Check your internet connection or ad blocker.', 'error');
+        return;
+      }
+
+      showSyncStatus('Opening Google authorization window...', 'info');
+
+      try {
+        gTokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly',
+          callback: async (resp) => {
+            if (resp.error) {
+              showSyncStatus('Authorization failed: ' + resp.error, 'error');
+              return;
+            }
+            gAccessToken = resp.access_token;
+            updateGoogleSyncBadge(true);
+            document.getElementById('btnDisconnectGoogle').classList.remove('hidden');
+            showSyncStatus('Authorized! Fetching live Google Calendar events and Google Tasks...', 'info');
+            await fetchAndMergeGoogleData();
+          }
+        });
+
+        gTokenClient.requestAccessToken({ prompt: 'consent' });
+      } catch (err) {
+        showSyncStatus('Error initializing Google OAuth: ' + err.message, 'error');
+      }
+    }
+
+    async function fetchAndMergeGoogleData() {
+      if (!gAccessToken) return;
+
+      try {
+        // 1. Fetch Calendar Events
+        const minDate = '2026-10-01T00:00:00Z';
+        const maxDate = '2027-02-28T23:59:59Z';
+        const calUrl = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(minDate)}&timeMax=${encodeURIComponent(maxDate)}&singleEvents=true&orderBy=startTime&maxResults=250`;
+        
+        const calRes = await fetch(calUrl, {
+          headers: { Authorization: `Bearer ${gAccessToken}` }
+        });
+        const calJson = await calRes.json();
+
+        // 2. Fetch Tasks
+        const tasksUrl = 'https://tasks.googleapis.com/tasks/v1/lists/@default/tasks?showCompleted=true&maxResults=100';
+        const tasksRes = await fetch(tasksUrl, {
+          headers: { Authorization: `Bearer ${gAccessToken}` }
+        });
+        const tasksJson = await tasksRes.json();
+
+        let liveGoogleTasks = [];
+
+        // Parse Google Tasks
+        if (tasksJson && tasksJson.items) {
+          tasksJson.items.forEach(item => {
+            if (!item.title) return;
+            const dStr = item.due ? item.due.split('T')[0] : '';
+            const matchCourse = item.title.match(/\[([A-Z0-9]+)\]/);
+            const course = matchCourse ? matchCourse[1] : 'GENERAL';
+            
+            liveGoogleTasks.push({
+              id: 'gt_' + item.id,
+              course: course,
+              title: item.title,
+              date: dStr,
+              time: '',
+              weight: 'Google Task',
+              desc: item.notes || '',
+              type: 'assignment',
+              completed: item.status === 'completed',
+              fromGoogle: true
+            });
+          });
+        }
+
+        // Parse Calendar events that are assessment/milestones (excluding regular recurring class hours)
+        if (calJson && calJson.items) {
+          calJson.items.forEach(ev => {
+            if (!ev.summary) return;
+            // Only add if it's an assessment/milestone or has bracket course tag
+            const isMilestone = ev.summary.includes('[') || /quiz|test|exam|presentation|submission|due|deployment|report/i.test(ev.summary);
+            if (!isMilestone) return;
+
+            const startStr = ev.start.dateTime || ev.start.date || '';
+            const dStr = startStr.split('T')[0];
+            const tStr = ev.start.dateTime ? ev.start.dateTime.split('T')[1].substring(0, 5) : '';
+            const matchCourse = ev.summary.match(/\[([A-Z0-9]+)\]/);
+            const course = matchCourse ? matchCourse[1] : 'CALENDAR';
+
+            // Check if already in tasks
+            const exists = liveGoogleTasks.some(t => t.title.trim().toLowerCase() === ev.summary.trim().toLowerCase() && t.date === dStr);
+            if (!exists) {
+              liveGoogleTasks.push({
+                id: 'gcal_' + ev.id,
+                course: course,
+                title: ev.summary,
+                date: dStr,
+                time: tStr,
+                weight: 'Calendar',
+                desc: ev.description || '',
+                type: /quiz|test|exam/i.test(ev.summary) ? 'quiz' : (/presentation/i.test(ev.summary) ? 'presentation' : 'assignment'),
+                completed: false,
+                fromGoogle: true
+              });
+            }
+          });
+        }
+
+        if (liveGoogleTasks.length > 0) {
+          // Merge with currentTasks: keep manual non-google tasks, merge new live google tasks
+          const manualTasks = currentTasks.filter(t => !t.fromGoogle && !t.id.startsWith('gt_') && !t.id.startsWith('gcal_'));
+          
+          // Deduplicate by title + date
+          const merged = [...manualTasks];
+          liveGoogleTasks.forEach(gTask => {
+            const existingIdx = merged.findIndex(m => m.title.trim().toLowerCase() === gTask.title.trim().toLowerCase() && m.date === gTask.date);
+            if (existingIdx !== -1) {
+              merged[existingIdx] = { ...merged[existingIdx], ...gTask };
+            } else {
+              merged.push(gTask);
+            }
+          });
+
+          currentTasks = merged;
+          saveTasks(currentTasks);
+          renderAllViews();
+          showSyncStatus(`Successfully synchronized ${liveGoogleTasks.length} items from Google!`, 'success');
+        } else {
+          showSyncStatus('Connected successfully! No additional items found in Google Tasks / Calendar.', 'success');
+        }
+
+      } catch (err) {
+        console.error('Google live sync error:', err);
+        showSyncStatus('Failed to fetch data from Google: ' + err.message, 'error');
+      }
+    }
+
     // Initialization
     window.addEventListener('DOMContentLoaded', () => {
+      initGoogleSyncEngine();
       document.getElementById('currentTimeDisplay').innerText = TODAY_STR;
       updateStatsAndBanner();
       renderMonthlyCalendar();
