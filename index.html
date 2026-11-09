@@ -685,7 +685,7 @@
     const INITIAL_TASKS = [];
 
     // Local Storage Keys
-    const STORAGE_KEY = 'academic_tracker_tasks_en_v17';
+    const STORAGE_KEY = 'academic_tracker_tasks_en_v18';
     const DAILY_TODOS_KEY = 'academic_tracker_daily_todos_en_v10';
     const DAILY_BLOCKS_KEY = 'academic_tracker_daily_blocks_en_v10';
 
@@ -2051,6 +2051,172 @@
     // ====================================================
     // GOOGLE CALENDAR & TASKS LIVE SYNC ENGINE
     // ====================================================
+    // ====================================================
+    // BIDIRECTIONAL TWO-WAY SYNC TO GOOGLE CLOUD
+    // ====================================================
+    async function syncTaskToGoogle(action, task) {
+      if (!gAccessToken) {
+        console.log('Cannot sync to Google: Not connected or no active session token.');
+        return;
+      }
+
+      try {
+        if (action === 'create') {
+          // 1. Create Event on Google Calendar
+          let calEventBody = {
+            summary: task.title,
+            description: task.desc || ''
+          };
+
+          if (task.time && task.date) {
+            calEventBody.start = { dateTime: `${task.date}T${task.time}:00+08:00`, timeZone: 'Asia/Kuala_Lumpur' };
+            calEventBody.end = { dateTime: `${task.date}T${task.time}:00+08:00`, timeZone: 'Asia/Kuala_Lumpur' };
+          } else if (task.date) {
+            calEventBody.start = { date: task.date };
+            calEventBody.end = { date: task.date };
+          }
+
+          const calRes = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${gAccessToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(calEventBody)
+          });
+          const calCreated = await calRes.json();
+          if (calCreated && calCreated.id) {
+            task.id = 'gcal_' + calCreated.id;
+            task.fromGoogle = true;
+            saveTasks(currentTasks);
+          }
+
+          // 2. Also create in Google Tasks for checklist integration
+          const dueStr = task.date ? `${task.date}T00:00:00.000Z` : undefined;
+          await fetch('https://tasks.googleapis.com/tasks/v1/lists/@default/tasks', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${gAccessToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              title: task.title,
+              notes: task.desc || '',
+              due: dueStr
+            })
+          });
+
+          showToast('Added event directly to your Google Calendar & Tasks! 🚀', 'success');
+
+        } else if (action === 'update') {
+          if (task.id && task.id.startsWith('gcal_')) {
+            const realId = task.id.replace('gcal_', '');
+            let patchBody = {
+              summary: task.title,
+              description: task.desc || ''
+            };
+            if (task.time && task.date) {
+              patchBody.start = { dateTime: `${task.date}T${task.time}:00+08:00`, timeZone: 'Asia/Kuala_Lumpur' };
+              patchBody.end = { dateTime: `${task.date}T${task.time}:00+08:00`, timeZone: 'Asia/Kuala_Lumpur' };
+            } else if (task.date) {
+              patchBody.start = { date: task.date };
+              patchBody.end = { date: task.date };
+            }
+
+            const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(realId)}`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${gAccessToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(patchBody)
+            });
+            if (res.ok) {
+              showToast('Updated event in Google Calendar! 📅', 'success');
+            }
+          } else if (task.id && task.id.startsWith('gt_')) {
+            const realId = task.id.replace('gt_', '');
+            const dueStr = task.date ? `${task.date}T00:00:00.000Z` : undefined;
+            const res = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/${encodeURIComponent(realId)}`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${gAccessToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                title: task.title,
+                notes: task.desc || '',
+                due: dueStr
+              })
+            });
+            if (res.ok) {
+              showToast('Updated task in Google Tasks! 📝', 'success');
+            }
+          }
+
+        } else if (action === 'delete') {
+          if (task.id && task.id.startsWith('gcal_')) {
+            const realId = task.id.replace('gcal_', '');
+            const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(realId)}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${gAccessToken}` }
+            });
+            if (res.ok) {
+              showToast('Deleted from Google Calendar! 🗑️', 'info');
+            }
+          } else if (task.id && task.id.startsWith('gt_')) {
+            const realId = task.id.replace('gt_', '');
+            const res = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/${encodeURIComponent(realId)}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${gAccessToken}` }
+            });
+            if (res.ok) {
+              showToast('Deleted from Google Tasks! 🗑️', 'info');
+            }
+          }
+
+        } else if (action === 'toggle') {
+          if (task.id && task.id.startsWith('gt_')) {
+            const realId = task.id.replace('gt_', '');
+            await fetch(`https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/${encodeURIComponent(realId)}`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${gAccessToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                status: task.completed ? 'completed' : 'needsAction'
+              })
+            });
+            showToast(task.completed ? 'Marked completed in Google Tasks! ✅' : 'Restored in Google Tasks! 🔄', 'success');
+          } else if (task.id && task.id.startsWith('gcal_')) {
+            // Calendar events don't have completed flag, update summary with [Done]
+            const realId = task.id.replace('gcal_', '');
+            let updatedSummary = task.title;
+            if (task.completed && !updatedSummary.startsWith('✅ ')) {
+              updatedSummary = '✅ ' + updatedSummary;
+            } else if (!task.completed && updatedSummary.startsWith('✅ ')) {
+              updatedSummary = updatedSummary.replace(/^✅\s*/, '');
+            }
+            task.title = updatedSummary;
+            saveTasks(currentTasks);
+            await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(realId)}`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${gAccessToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ summary: updatedSummary })
+            });
+            showToast(task.completed ? 'Marked [Done] in Google Calendar! ✅' : 'Restored in Google Calendar! 🔄', 'success');
+          }
+        }
+      } catch (err) {
+        console.error('Google Two-Way Sync Write Error:', err);
+        showToast('Google write error: ' + err.message, 'error');
+      }
+    }
+
     // Pre-configured Google OAuth Client ID
     const DEFAULT_GOOGLE_CLIENT_ID = "725359638596-1cjrf8r6qtq8n194qntp4nv4ua7mqvl0.apps.googleusercontent.com";
 
@@ -2209,7 +2375,7 @@
       try {
         gTokenClient = google.accounts.oauth2.initTokenClient({
           client_id: clientId,
-          scope: 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks.readonly',
+          scope: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/tasks',
           callback: async (resp) => {
             if (resp.error) {
               showSyncStatus('Authorization failed: ' + resp.error, 'error');
