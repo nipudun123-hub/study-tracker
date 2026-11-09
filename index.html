@@ -42,11 +42,11 @@
               <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Academic Task & Schedule Dashboard</h1>
               <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
-                Calendar Live Synced
+                Fully Editable & Synced
               </span>
             </div>
             <p class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
-              <span>Date: <span id="currentTimeDisplay" class="text-indigo-600 font-bold">2026-11-08</span></span>
+              <span>Date: <span id="currentTimeDisplay" class="text-indigo-600 font-bold">2026-11-09</span></span>
               <span class="text-slate-300">|</span>
               <span id="liveClockDisplay" class="text-slate-400 font-mono text-[11px]"></span>
             </p>
@@ -57,7 +57,7 @@
         <div class="flex items-center space-x-2">
           <button id="btnQuickAdd" class="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Add Task
+            Add Task / DDL
           </button>
           <button id="btnResetData" class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition" title="Reset all tasks to default">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -74,7 +74,8 @@
         </button>
         <button id="navTabDaily" class="main-nav-tab py-2.5 text-xs font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span>⏰ Daily Schedule & Timetable</span>
+          <span>⏰ Daily Schedule & Custom Timetable</span>
+          <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 text-indigo-700 font-bold ml-1">Editable</span>
         </button>
         <button id="navTabTimeline" class="main-nav-tab py-2.5 text-xs font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
@@ -93,7 +94,7 @@
         <div>
           <p class="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total Tasks</p>
           <p id="statTotalCount" class="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">0</p>
-          <span class="text-[11px] text-slate-400">Across 5 Courses + FYP</span>
+          <span class="text-[11px] text-slate-400">Dynamic & Auto-updated</span>
         </div>
         <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
@@ -226,7 +227,7 @@
             <h3 id="calPreviewDateTitle" class="text-sm font-bold text-slate-900">Selected Date Details</h3>
           </div>
           <button id="btnSwitchToDailyView" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center">
-            View Full Day Timetable (07:00 ~ 23:00) →
+            Open & Edit Full Day Timetable (Daily Schedule) →
           </button>
         </div>
         <div id="calPreviewTaskList" class="mt-3 space-y-2">
@@ -236,7 +237,7 @@
     </div>
 
     <!-- ==================================================== -->
-    <!-- VIEW 2: DAILY SCHEDULE (Daily Plan & Timetable) -->
+    <!-- VIEW 2: DAILY SCHEDULE (Fully Editable Day Planner) -->
     <!-- ==================================================== -->
     <div id="viewDailySection" class="hidden space-y-5">
       
@@ -247,8 +248,8 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
           </button>
           <div>
-            <h2 id="dailySelectedDateTitle" class="text-base font-bold text-slate-900 leading-tight">Sunday, 8 November 2026</h2>
-            <p id="dailySelectedDaySubtitle" class="text-xs text-indigo-600 font-medium">Focused Day · Week 6</p>
+            <h2 id="dailySelectedDateTitle" class="text-base font-bold text-slate-900 leading-tight">Monday, 9 November 2026</h2>
+            <p id="dailySelectedDaySubtitle" class="text-xs text-indigo-600 font-medium">Daily Timeline Planner</p>
           </div>
           <button id="btnNextDay" class="p-2 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition" title="Next Day">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -271,18 +272,61 @@
       <!-- Main Two-Column Daily View: Left Timetable | Right DDL Checklist -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-        <!-- Left Column: Timetable (07:00 ~ 23:00) -->
+        <!-- Left Column: Timetable (Fully Editable & Customizable) -->
         <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
           <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-              <h3 class="text-xs sm:text-sm font-bold text-slate-800">Daily Timeline & Class Schedule (07:00 ~ 23:00)</h3>
+              <h3 class="text-xs sm:text-sm font-bold text-slate-800">Timeline & Time Blocks (Fully Editable)</h3>
             </div>
-            <span class="text-[11px] text-slate-400">Regular classes & routine</span>
+            <!-- Add Custom Time Block Button -->
+            <button id="btnAddDailyBlock" class="inline-flex items-center px-2.5 py-1 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold transition">
+              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Add Time Block
+            </button>
+          </div>
+
+          <!-- Inline Form to Add/Edit Time Block -->
+          <div id="inlineAddBlockForm" class="hidden p-3.5 bg-indigo-50/40 border-b border-indigo-100 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-900" id="blockFormTitle">Create Custom Schedule Block</span>
+              <button id="btnCloseBlockForm" class="text-slate-400 hover:text-slate-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <div class="sm:col-span-4">
+                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Time Range (e.g. 15:00 - 17:00) *</label>
+                <input type="text" id="inputBlockTime" placeholder="14:00 - 16:00" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              </div>
+              <div class="sm:col-span-8">
+                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Title / Activity *</label>
+                <input type="text" id="inputBlockTitle" placeholder="e.g., IoT Lab Exercise / Study Session" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <div class="sm:col-span-4">
+                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Category</label>
+                <select id="selectBlockType" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white focus:outline-none">
+                  <option value="study">💻 Focus Study</option>
+                  <option value="routine">🌅 Routine / Habit</option>
+                  <option value="class">📚 Class / Tutorial</option>
+                  <option value="special_exam">🔥 Assessment</option>
+                </select>
+              </div>
+              <div class="sm:col-span-8">
+                <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Venue / Details / Notes</label>
+                <input type="text" id="inputBlockDesc" placeholder="e.g., Library 2nd floor, bring textbook" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              </div>
+            </div>
+            <div class="flex items-center justify-end space-x-2 pt-1">
+              <button id="btnCancelBlockForm" class="px-3 py-1 rounded text-xs font-medium text-slate-600 hover:bg-slate-100">Cancel</button>
+              <button id="btnSaveBlockForm" class="px-3.5 py-1 rounded text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs">Save Time Block</button>
+            </div>
           </div>
 
           <div class="p-4 flex-1 custom-scrollbar max-h-[640px] overflow-y-auto space-y-2.5" id="dailyHourlyTimeline">
-            <!-- Hourly events rendered dynamically -->
+            <!-- Hourly events rendered dynamically with Edit and Delete options -->
           </div>
         </div>
 
@@ -304,7 +348,7 @@
             </div>
           </div>
 
-          <!-- Card 2: Interactive Daily Focus Checklist -->
+          <!-- Card 2: Interactive Daily Action Steps Checklist -->
           <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4">
             <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
               <div>
@@ -512,8 +556,6 @@
 
   <!-- Core Application Logic -->
   <script>
-    // DYNAMIC TODAY RESOLUTION:
-    // Automatically checks user's actual system date, and supports 2026 academic calendar sync
     function resolveInitialDate() {
       const now = new Date();
       const y = now.getFullYear();
@@ -530,13 +572,12 @@
         return realTodayStr;
       }
 
-      return '2026-11-08';
+      return '2026-11-09';
     }
 
     let TODAY_STR = resolveInitialDate();
     let TODAY = new Date(TODAY_STR + 'T00:00:00');
 
-    // Calendar View active month (Year-Month)
     let calCurrentYear = parseInt(TODAY_STR.split('-')[0]);
     let calCurrentMonth = parseInt(TODAY_STR.split('-')[1]);
     let calSelectedDayStr = TODAY_STR;
@@ -562,70 +603,54 @@
       // Thursday (4)
       { dayOfWeek: 4, start: '08:00', end: '10:00', title: 'BBB3033(K10) English for Occupational Purposes', location: 'BI2-02', type: 'class', course: 'BBB3033' },
       { dayOfWeek: 4, start: '14:00', end: '16:00', title: 'CSE3403(K2) Software Project Management', location: 'IBH11', type: 'class', course: 'CSE3403' },
-      { dayOfWeek: 4, start: '16:00', end: '18:00', title: 'CSE3423(K1) Software Quality Assurance', location: 'BK3-02', type: 'class', course: 'CSE3423' },
-
-      // Daily fixed routine
-      { dailyRoutine: true, start: '07:00', end: '08:00', title: '🌅 Wake Up & Morning Routine', type: 'routine' },
-      { dailyRoutine: true, start: '12:00', end: '13:30', title: '🍱 Lunch & Midday Break', type: 'routine' },
-      { dailyRoutine: true, start: '18:30', end: '19:30', title: '🍲 Dinner & Evening Walk', type: 'routine' },
-      { dailyRoutine: true, start: '23:00', end: '07:00', title: '🌙 Sleep Schedule (11 PM - 7 AM)', type: 'routine' }
+      { dayOfWeek: 4, start: '16:00', end: '18:00', title: 'CSE3423(K1) Software Quality Assurance', location: 'BK3-02', type: 'class', course: 'CSE3423' }
     ];
 
-    // Master Task List across all courses (in English)
+    // Default suggested routines (user can delete, edit, or add their own)
+    const DEFAULT_ROUTINES = [
+      { id: 'def_r1', time: '07:00 - 08:00', title: '🌅 Wake Up & Morning Routine', desc: 'Start the day fresh & healthy breakfast', type: 'routine' },
+      { id: 'def_r2', time: '12:00 - 13:30', title: '🍱 Lunch Break & Rest', desc: 'Recharge & take a short midday rest', type: 'routine' },
+      { id: 'def_r3', time: '18:30 - 19:30', title: '🍲 Dinner & Evening Walk', desc: 'Relax and unwind from screen', type: 'routine' },
+      { id: 'def_r4', time: '19:30 - 22:30', title: '💻 Focus Study & Assignment Sprint', desc: 'Work on deliverables & exam preparation', type: 'study' },
+      { id: 'def_r5', time: '23:00 - 07:00', title: '🌙 Sleep Schedule (11 PM - 7 AM)', desc: 'Consistent bedtime for optimal rest', type: 'routine' }
+    ];
+
+    // Master Task List
     const INITIAL_TASKS = [
-      // Week 4 Historical
       { id: 't_csm_reg', course: 'CSM3313', title: '[CSM3313] Group Registration for Project', date: '2026-10-25', time: '', weight: 'Registration', desc: 'IoT Computing project group registration', type: 'assignment', completed: true },
       { id: 't_bbb_port', course: 'BBB3033', title: '[BBB3033] Job Application Portfolio Submission', date: '2026-10-25', time: '', weight: '15%', desc: 'Individual portfolio & resume defense submission', type: 'assignment', completed: true },
       { id: 't_cse_wbs', course: 'CSE3403', title: '[CSE3403] Lab Report 1: WBS Submission', date: '2026-10-29', time: '', weight: '2.5%', desc: 'Work Breakdown Structure practical report', type: 'report', completed: true },
       { id: 't_bbk_v1', course: 'BBK3033', title: '[BBK3033] Make a video (group) 1', date: '2026-10-31', time: '', weight: 'Video (20%)', desc: 'Chapter 1 Korean conversation video submission', type: 'video', completed: true },
-      
-      // Week 5
       { id: 't_bbk_q1', course: 'BBK3033', title: '[BBK3033] Quiz 1', date: '2026-11-03', time: '', weight: 'Quiz (10%)', desc: 'Chapter 2 workbook in-class quiz 1', type: 'quiz', completed: true },
       { id: 't_cse_t1', course: 'CSE3403', title: '[CSE3403] Group Project Task 1: Project Charter Submission', date: '2026-11-05', time: '', weight: 'Milestone DDL', desc: 'Project Charter (MYR 1,000,000 budget, 2-year timeline, SMART goals)', type: 'assignment', completed: true },
-
-      // Week 6 (Current Crunch Week)
       { id: 't_csf_ind', course: 'CSF3253', title: '[CSF3253] Individual Assignment Submission', date: '2026-11-08', time: '', weight: '15%', desc: 'Intelligent System individual assignment submission (PLO2 5%, PLO9 10%)', type: 'assignment', completed: true },
       { id: 't_csm_q1', course: 'CSM3313', title: '[CSM3313] Quiz #1 (Lab Session)', date: '2026-11-09', time: '14:00', weight: '5%', desc: 'IoT Computing lab practical quiz 1 (Topics 1-3 & Lab Lessons 1-13)', type: 'quiz', completed: false },
-      { id: 'e_pita_int1', course: 'PITA 1', title: '[PITA 1] Interim 1 Evaluation', date: '2026-11-10', time: '11:00 - 13:00', weight: 'Defense Eval', desc: 'Final Year Project 1 (FYP 1) first interim progress evaluation defense', type: 'presentation', completed: false },
       { id: 't_csf_q1_mem', course: 'CSF3253', title: 'quiz 1 intelligent system', date: '2026-11-10', time: '', weight: 'Quiz Note', desc: 'Intelligent System quiz 1 preparation memo', type: 'quiz', completed: false },
+      { id: 't_pita_int1', course: 'PITA 1', title: '[PITA 1] Interim 1 Submission Deadline', date: '2026-11-12', time: '23:59', weight: 'Artifact Submission', desc: 'Required evidence: SPMP (Project management plan), Gantt chart / project schedule, and BMC (Business Model Canvas)', type: 'assignment', completed: false },
       { id: 't_cse_rep2', course: 'CSE3403', title: '[CSE3403] Lab Report 2: Schedule Management Submission', date: '2026-11-12', time: '', weight: '2.5%', desc: 'Project Schedule Management practical lab report', type: 'report', completed: false },
       { id: 't_csq_as1', course: 'CSE3423', title: '[CSE3423] Assignment 1 Submission & Teamwork Observation', date: '2026-11-12', time: '', weight: '20%', desc: 'SQA major assignment 1 (Report 10% + Output 5% + Observation 5%)', type: 'assignment', completed: false },
-
-      // Week 7
       { id: 't_csf_q1_off', course: 'CSF3253', title: '[CSF3253] Quiz 1', date: '2026-11-16', time: '', weight: '5%', desc: 'Intelligent System official quiz 1 (Topics 1-4, PLO1)', type: 'quiz', completed: false },
       { id: 't_cse_t2', course: 'CSE3403', title: '[CSE3403] Group Project Task 2: Gantt Chart Submission', date: '2026-11-19', time: '', weight: 'Milestone DDL', desc: 'Dynamic Gantt chart, task durations, dependencies, and critical path', type: 'assignment', completed: false },
       { id: 't_bbb_quiz', course: 'BBB3033', title: '[BBB3033] Quiz (Cover Letter, Email & Language)', date: '2026-11-19', time: '20:00 - 21:45', weight: '30%', desc: 'Central Lecture Complex (KKP, UMT) physical exam (Cover Letter & Email 20% + Language 10%)', type: 'quiz', completed: false },
       { id: 't_bbk_v2', course: 'BBK3033', title: '[BBK3033] Make a video (group) 2', date: '2026-11-21', time: '', weight: 'Video (20%)', desc: 'Chapter 2 Korean conversation video submission', type: 'video', completed: false },
       { id: 't_bbk_q2', course: 'BBK3033', title: '[BBK3033] Quiz 2', date: '2026-11-22', time: '', weight: 'Quiz (10%)', desc: 'Chapter 3 workbook in-class quiz 2', type: 'quiz', completed: false },
-
-      // Week 8
       { id: 't_csf_mid', course: 'CSF3253', title: '[CSF3253] Midterm Test', date: '2026-11-23', time: '', weight: '15%', desc: 'Intelligent System midterm test (PLO2 15%)', type: 'exam', completed: false },
       { id: 't_cse_rep3', course: 'CSE3403', title: '[CSE3403] Lab Report 3: Cost Management Submission', date: '2026-11-26', time: '', weight: '2.5%', desc: 'Project Cost Management practical lab report', type: 'report', completed: false },
-
-      // Week 9
       { id: 't_csm_labtest', course: 'CSM3313', title: '[CSM3313] Lab Test', date: '2026-11-30', time: '14:00', weight: '20%', desc: 'IoT Computing major lab practical exam (20%)', type: 'exam', completed: false },
       { id: 't_cse_mid_official', course: 'CSE3403', title: '[CSE3403] Midterm Examination', date: '2026-12-02', time: '10:00 - 11:00', weight: '20%', desc: 'Designated classroom exam covering Chapters 1–6 (40 questions). Bring ID & calculator', type: 'exam', completed: false },
       { id: 't_csq_as2', course: 'CSE3423', title: '[CSE3423] Assignment 2 Submission & Teamwork Observation', date: '2026-12-03', time: '', weight: '20%', desc: 'SQA major assignment 2 (Report 10% + Output 5% + Observation 5%)', type: 'assignment', completed: false },
       { id: 't_csq_mid', course: 'CSE3423', title: '[CSE3423] Midterm Test', date: '2026-12-03', time: '', weight: '20%', desc: 'Software Quality Assurance midterm examination (20%)', type: 'exam', completed: false },
-
-      // Week 10
       { id: 't_cse_q1', course: 'CSE3403', title: '[CSE3403] Quiz 1 (Chapters 1, 2, 6, 7)', date: '2026-12-10', time: '', weight: '2.5%', desc: 'Software Project Management quiz 1', type: 'quiz', completed: false },
       { id: 't_bbk_v3', course: 'BBK3033', title: '[BBK3033] Make a video (group) 3', date: '2026-12-12', time: '', weight: 'Video (20%)', desc: 'Chapter 3 Korean conversation video submission', type: 'video', completed: false },
       { id: 't_bbk_q3', course: 'BBK3033', title: '[BBK3033] Quiz 3', date: '2026-12-13', time: '', weight: 'Quiz (10%)', desc: 'Chapter 4 workbook in-class quiz 3', type: 'quiz', completed: false },
-
-      // Week 11
       { id: 't_csf_q2', course: 'CSF3253', title: '[CSF3253] Quiz 2', date: '2026-12-14', time: '', weight: '5%', desc: 'Intelligent System official quiz 2 (Topics 5-7, PLO1)', type: 'quiz', completed: false },
       { id: 't_cse_rep4', course: 'CSE3403', title: '[CSE3403] Lab Report 4: Communication Management Submission', date: '2026-12-17', time: '', weight: '2.5%', desc: 'Project Communication Management practical lab report', type: 'report', completed: false },
       { id: 't_cse_rep_final', course: 'CSE3403', title: '[CSE3403] Group Project Final Report Submission', date: '2026-12-17', time: '', weight: '15%', desc: 'Task 3 Cost Baseline + Complete Consolidated Project Documentation (15%)', type: 'assignment', completed: false },
-
-      // Week 12
       { id: 'e_cse_pres1', course: 'CSE3403', title: '[CSE3403] Group Presentation (Session 1)', date: '2026-12-20', time: '', weight: 'Presentation', desc: 'Software Project Management group presentation round 1', type: 'presentation', completed: false },
       { id: 'e_pita_int2', course: 'PITA 1', title: '[PITA 1] Interim 2 Evaluation', date: '2026-12-22', time: '11:00 - 13:00', weight: 'Defense Eval', desc: 'Final Year Project 1 (FYP 1) second interim progress evaluation defense', type: 'presentation', completed: false },
       { id: 't_csm_deploy', course: 'CSM3313', title: '[CSM3313] Project Deployment & Monitoring', date: '2026-12-26', time: '', weight: 'Lab 12', desc: 'IoT Computing field project deployment and live sensor monitoring', type: 'assignment', completed: false },
       { id: 't_bbk_v4', course: 'BBK3033', title: '[BBK3033] Make a video (group) 4', date: '2026-12-26', time: '', weight: 'Video (20%)', desc: 'Chapter 4 Korean conversation video submission', type: 'video', completed: false },
       { id: 't_bbk_q4', course: 'BBK3033', title: '[BBK3033] Quiz 4', date: '2026-12-27', time: '', weight: 'Quiz (10%)', desc: 'Korean workbook comprehensive quiz 4', type: 'quiz', completed: false },
-
-      // Week 13
       { id: 'e_cse_pres2', course: 'CSE3403', title: '[CSE3403] Group Presentation (Session 2)', date: '2026-12-27', time: '', weight: 'Presentation', desc: 'Software Project Management group presentation round 2', type: 'presentation', completed: false },
       { id: 't_csm_q2', course: 'CSM3313', title: '[CSM3313] Quiz #2 (Lab Session)', date: '2026-12-28', time: '14:00', weight: '5%', desc: 'IoT Computing lab practical quiz 2 (5%)', type: 'quiz', completed: false },
       { id: 'e_pita_pres', course: 'PITA 1', title: '[PITA 1] Final Presentation', date: '2026-12-29', time: '11:00 - 13:00', weight: 'Final Defense', desc: 'Final Year Project 1 (FYP 1) end-of-semester final presentation & defense', type: 'presentation', completed: false },
@@ -635,8 +660,6 @@
       { id: 't_bbk_ind_vid', course: 'BBK3033', title: '[BBK3033] Individual Video: Self-Introduction', date: '2026-12-31', time: '', weight: '10%', desc: '2-minute Korean spoken self-introduction video', type: 'video', completed: false },
       { id: 't_bbk_scrap', course: 'BBK3033', title: '[BBK3033] Group Scrapbook Submission', date: '2026-12-31', time: '', weight: '10%', desc: 'Korean cultural topic scrapbook hardcopy submission', type: 'assignment', completed: false },
       { id: 't_bbk_wbook', course: 'BBK3033', title: '[BBK3033] Finish Workbook Submission', date: '2026-12-31', time: '', weight: '10%', desc: 'Complete Korean workbook exercise submission (10%)', type: 'assignment', completed: false },
-
-      // Week 14
       { id: 't_bbb_prop', course: 'BBB3033', title: '[BBB3033] Proposal Writing Assessment', date: '2027-01-02', time: '09:00 - 10:00', weight: '20%', desc: 'Central Lecture Complex (KKP, UMT) 1-hour physical final writing exam (20%)', type: 'exam', completed: false },
       { id: 'e_csf_pres2', course: 'CSF3253', title: '[CSF3253] Group Presentation (Continued)', date: '2027-01-03', time: '', weight: 'Presentation', desc: 'Intelligent System oral group presentation (continued session)', type: 'presentation', completed: false },
       { id: 't_bbk_test1', course: 'BBK3033', title: '[BBK3033] Test 1 (Grammar)', date: '2027-01-03', time: '', weight: '30%', desc: 'Comprehensive Korean grammar written final exam (30%)', type: 'exam', completed: false },
@@ -646,9 +669,10 @@
       { id: 't_cse_q2', course: 'CSE3403', title: '[CSE3403] Quiz 2 (Chapters 7, 9, 10, 11)', date: '2027-01-07', time: '', weight: '2.5%', desc: 'Software Project Management quiz 2', type: 'quiz', completed: false }
     ];
 
-    // Storage Key
-    const STORAGE_KEY = 'academic_tracker_tasks_en_v2';
-    const DAILY_TODOS_KEY = 'academic_tracker_daily_todos_en_2026';
+    // Local Storage Keys
+    const STORAGE_KEY = 'academic_tracker_tasks_en_v4';
+    const DAILY_TODOS_KEY = 'academic_tracker_daily_todos_en_v4';
+    const DAILY_BLOCKS_KEY = 'academic_tracker_daily_blocks_en_v4';
 
     function loadTasks() {
       try {
@@ -689,10 +713,31 @@
       }
     }
 
+    // Custom Daily Schedule Blocks per date
+    function loadDailyBlocks() {
+      try {
+        const stored = localStorage.getItem(DAILY_BLOCKS_KEY);
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('localStorage daily blocks error', e);
+      }
+      return {};
+    }
+
+    function saveDailyBlocks(blocks) {
+      try {
+        localStorage.setItem(DAILY_BLOCKS_KEY, JSON.stringify(blocks));
+      } catch (e) {
+        console.warn('localStorage daily blocks save error', e);
+      }
+    }
+
     // App State
     let currentTasks = loadTasks();
     let currentDailyTodos = loadDailyTodos();
-    let activeNavTab = 'calendar'; // 'calendar', 'daily', or 'timeline'
+    let currentDailyBlocks = loadDailyBlocks();
+
+    let activeNavTab = 'daily'; // default to daily view as requested
     let currentFilter = 'all';
     let currentCourseFilter = 'ALL';
     let searchQuery = '';
@@ -701,6 +746,7 @@
     let categoryChartInstance = null;
 
     let selectedDailyDateStr = TODAY_STR;
+    let editingBlockId = null;
 
     // Toast helper
     function showToast(message, type = 'info') {
@@ -719,7 +765,6 @@
       }, 2500);
     }
 
-    // Badge styling helpers
     function getCourseBadgeStyle(course) {
       switch (course) {
         case 'PITA 1': return 'bg-rose-100 text-rose-800 border-rose-200';
@@ -757,7 +802,6 @@
       }
     }
 
-    // Days Diff calculation
     function getDaysDiff(dateStr) {
       if (!dateStr) return 999;
       const target = new Date(dateStr + 'T00:00:00');
@@ -1016,7 +1060,7 @@
     }
 
     // ====================================================
-    // 2. DAILY SCHEDULE VIEW (English)
+    // 2. DAILY SCHEDULE VIEW (Editable Time Blocks)
     // ====================================================
 
     function renderDailyView() {
@@ -1082,43 +1126,72 @@
       });
     }
 
+    // Fully Editable Hourly Timetable Engine
     function renderHourlyTimetable(dateStr, dayOfWeek, isWeekend) {
       const container = document.getElementById('dailyHourlyTimeline');
+      
+      // 1. Regular university classes
       const todayClasses = WEEKLY_CLASSES.filter(c => c.dayOfWeek === dayOfWeek);
+
+      // 2. Timed exams / quizzes on this date
       const timedEvents = currentTasks.filter(t => t.date === dateStr && t.time);
 
-      let blocks = [];
-      blocks.push({ time: '07:00 - 08:00', title: '🌅 Wake Up & Morning Routine', desc: 'Start the day fresh', type: 'routine' });
+      // 3. User's customized daily schedule blocks for this specific date
+      let customDateBlocks = currentDailyBlocks[dateStr];
 
-      todayClasses.forEach(c => {
-        blocks.push({
+      // If user hasn't customized this date yet, initialize with default suggestions
+      if (!customDateBlocks) {
+        customDateBlocks = JSON.parse(JSON.stringify(DEFAULT_ROUTINES));
+        currentDailyBlocks[dateStr] = customDateBlocks;
+        saveDailyBlocks(currentDailyBlocks);
+      }
+
+      // Merge all items for display
+      let allItems = [];
+
+      // Add regular classes (fixed by university)
+      todayClasses.forEach((c, idx) => {
+        allItems.push({
+          id: `class_${idx}`,
           time: `${c.start} - ${c.end}`,
           title: c.title,
           desc: `📍 Venue: ${c.location}`,
           type: 'class',
-          course: c.course
+          course: c.course,
+          canEdit: false
         });
       });
 
+      // Add timed assessments (official)
       timedEvents.forEach(e => {
-        blocks.push({
+        allItems.push({
+          id: `event_${e.id}`,
           time: e.time,
           title: `🔥 【Assessment】${e.title}`,
           desc: `${e.desc || ''} (Weightage: ${e.weight})`,
           type: 'special_exam',
-          course: e.course
+          course: e.course,
+          canEdit: false
         });
       });
 
-      blocks.push({ time: '12:00 - 13:30', title: '🍱 Lunch Break & Rest', desc: 'Recharge & take a short rest', type: 'routine' });
-      blocks.push({ time: '18:30 - 19:30', title: '🍲 Dinner & Evening Walk', desc: 'Relax and unwind from screen', type: 'routine' });
-      blocks.push({ time: '19:30 - 22:30', title: '💻 Focus Study & Assignment Sprint', desc: 'Work on deliverables & exam preparation', type: 'study' });
-      blocks.push({ time: '23:00', title: '🌙 Sleep Schedule (11 PM - 7 AM)', desc: 'Consistent bedtime for optimal rest', type: 'routine' });
+      // Add user editable routines / tasks
+      customDateBlocks.forEach(b => {
+        allItems.push({
+          id: b.id,
+          time: b.time,
+          title: b.title,
+          desc: b.desc,
+          type: b.type,
+          canEdit: true
+        });
+      });
 
-      blocks.sort((a, b) => a.time.localeCompare(b.time));
+      // Sort chronological by start time
+      allItems.sort((a, b) => a.time.localeCompare(b.time));
 
       let html = '';
-      blocks.forEach(item => {
+      allItems.forEach(item => {
         let borderClass = 'border-slate-100 bg-slate-50/50';
         let badge = '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500">Routine</span>';
 
@@ -1130,27 +1203,87 @@
           badge = '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-600 text-white">Assessment Period</span>';
         } else if (item.type === 'study') {
           borderClass = 'border-indigo-200 bg-indigo-50/40 hover:bg-indigo-50';
-          badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700">Prime Study Block</span>';
+          badge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700">Focus Study</span>';
         }
 
         html += `
-          <div class="p-3 rounded-xl border ${borderClass} transition flex items-start space-x-3">
-            <div class="flex-shrink-0 w-28 text-xs font-bold text-slate-700 pt-0.5 flex items-center">
-              <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              ${item.time}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center space-x-2 mb-0.5">
-                ${badge}
-                <h4 class="text-xs font-bold text-slate-900 truncate">${item.title}</h4>
+          <div class="p-3 rounded-xl border ${borderClass} transition flex items-start justify-between gap-3 group">
+            <div class="flex items-start space-x-3 flex-1 min-w-0">
+              <div class="flex-shrink-0 w-28 text-xs font-bold text-slate-700 pt-0.5 flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                ${item.time}
               </div>
-              <p class="text-[11px] text-slate-500">${item.desc}</p>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center space-x-2 mb-0.5">
+                  ${badge}
+                  <h4 class="text-xs font-bold text-slate-900 truncate">${item.title}</h4>
+                </div>
+                ${item.desc ? `<p class="text-[11px] text-slate-500">${item.desc}</p>` : ''}
+              </div>
             </div>
+
+            <!-- Action buttons for user-editable blocks -->
+            ${item.canEdit ? `
+              <div class="flex items-center space-x-1 opacity-70 group-hover:opacity-100 transition flex-shrink-0">
+                <button class="p-1 text-slate-400 hover:text-indigo-600 rounded edit-daily-block-btn" data-id="${item.id}" title="Edit this block">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </button>
+                <button class="p-1 text-slate-400 hover:text-rose-500 rounded delete-daily-block-btn" data-id="${item.id}" title="Delete this block">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </div>
+            ` : ''}
           </div>
         `;
       });
 
       container.innerHTML = html;
+
+      // Bind edit and delete handlers
+      container.querySelectorAll('.edit-daily-block-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          openEditBlockForm(id);
+        });
+      });
+
+      container.querySelectorAll('.delete-daily-block-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          deleteDailyBlock(id);
+        });
+      });
+    }
+
+    function openEditBlockForm(blockId) {
+      const form = document.getElementById('inlineAddBlockForm');
+      const formTitle = document.getElementById('blockFormTitle');
+      const blocks = currentDailyBlocks[selectedDailyDateStr] || [];
+      const target = blocks.find(b => b.id === blockId);
+
+      if (!target) return;
+
+      editingBlockId = blockId;
+      formTitle.innerText = 'Edit Schedule Block';
+      document.getElementById('inputBlockTime').value = target.time || '';
+      document.getElementById('inputBlockTitle').value = target.title || '';
+      document.getElementById('selectBlockType').value = target.type || 'study';
+      document.getElementById('inputBlockDesc').value = target.desc || '';
+
+      form.classList.remove('hidden');
+      document.getElementById('inputBlockTitle').focus();
+    }
+
+    function deleteDailyBlock(blockId) {
+      const blocks = currentDailyBlocks[selectedDailyDateStr] || [];
+      const idx = blocks.findIndex(b => b.id === blockId);
+      if (idx !== -1) {
+        blocks.splice(idx, 1);
+        currentDailyBlocks[selectedDailyDateStr] = blocks;
+        saveDailyBlocks(currentDailyBlocks);
+        renderDailyView();
+        showToast('Schedule block removed', 'info');
+      }
     }
 
     function renderDailyDdls(dateStr) {
@@ -1271,7 +1404,7 @@
     }
 
     // ====================================================
-    // 3. MASTER TIMELINE VIEW (English)
+    // 3. MASTER TIMELINE VIEW
     // ====================================================
 
     function renderTaskList() {
@@ -1594,6 +1727,62 @@
         }
       });
 
+      // Add & Edit Daily Schedule Blocks
+      const formBlock = document.getElementById('inlineAddBlockForm');
+      document.getElementById('btnAddDailyBlock').addEventListener('click', () => {
+        editingBlockId = null;
+        document.getElementById('blockFormTitle').innerText = 'Create Custom Schedule Block';
+        document.getElementById('inputBlockTime').value = '';
+        document.getElementById('inputBlockTitle').value = '';
+        document.getElementById('inputBlockDesc').value = '';
+        formBlock.classList.remove('hidden');
+        document.getElementById('inputBlockTime').focus();
+      });
+
+      document.getElementById('btnCloseBlockForm').addEventListener('click', () => formBlock.classList.add('hidden'));
+      document.getElementById('btnCancelBlockForm').addEventListener('click', () => formBlock.classList.add('hidden'));
+
+      document.getElementById('btnSaveBlockForm').addEventListener('click', () => {
+        const time = document.getElementById('inputBlockTime').value.trim();
+        const title = document.getElementById('inputBlockTitle').value.trim();
+        const type = document.getElementById('selectBlockType').value;
+        const desc = document.getElementById('inputBlockDesc').value.trim();
+
+        if (!time || !title) {
+          showToast('Please enter both time range and activity title', 'urgent');
+          return;
+        }
+
+        let blocks = currentDailyBlocks[selectedDailyDateStr] || [];
+
+        if (editingBlockId) {
+          // Edit existing
+          const target = blocks.find(b => b.id === editingBlockId);
+          if (target) {
+            target.time = time;
+            target.title = title;
+            target.type = type;
+            target.desc = desc;
+          }
+          showToast('Time block updated successfully!', 'success');
+        } else {
+          // Add new block
+          blocks.push({
+            id: 'block_' + Date.now(),
+            time,
+            title,
+            type,
+            desc
+          });
+          showToast('New time block scheduled!', 'success');
+        }
+
+        currentDailyBlocks[selectedDailyDateStr] = blocks;
+        saveDailyBlocks(currentDailyBlocks);
+        formBlock.classList.add('hidden');
+        renderDailyView();
+      });
+
       // Add custom micro-todo
       document.getElementById('btnDailyAddTodo').addEventListener('click', () => {
         const input = document.getElementById('dailyNewTodoInput');
@@ -1719,7 +1908,9 @@
       // Reset Defaults
       document.getElementById('btnResetData').addEventListener('click', () => {
         currentTasks = JSON.parse(JSON.stringify(INITIAL_TASKS));
+        currentDailyBlocks = {};
         saveTasks(currentTasks);
+        saveDailyBlocks(currentDailyBlocks);
         updateStatsAndBanner();
         renderMonthlyCalendar();
         renderTaskList();
