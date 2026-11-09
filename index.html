@@ -2926,7 +2926,7 @@
 
     function openGoogleSyncModal() {
       document.getElementById('googleSyncModal').classList.remove('hidden');
-      const savedClientId = localStorage.getItem('academic_tracker_gclient_id') || DEFAULT_GOOGLE_CLIENT_ID;
+      const savedClientId = DEFAULT_GOOGLE_CLIENT_ID || localStorage.getItem('academic_tracker_gclient_id');
       if (savedClientId) {
         document.getElementById('inputGoogleClientId').value = savedClientId;
       }
@@ -2986,7 +2986,7 @@
     }
 
     function startGoogleOAuthFlow() {
-      const clientId = document.getElementById('inputGoogleClientId').value.trim();
+      const clientId = DEFAULT_GOOGLE_CLIENT_ID || document.getElementById('inputGoogleClientId').value.trim();
       if (!clientId) {
         showSyncStatus('Please enter a valid Google OAuth Client ID.', 'error');
         return;
